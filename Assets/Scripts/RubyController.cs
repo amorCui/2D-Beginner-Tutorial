@@ -3,6 +3,34 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class RubyController : MonoBehaviour {
+
+    /// <summary>
+    /// 
+    /// </summary>
+    float _horizontal;
+    /// <summary>
+    /// 
+    /// </summary>
+    float _vertical;
+
+    /// <summary>
+    /// 绑定对象的刚体
+    /// </summary>
+    Rigidbody2D _rigidbody2d;
+
+    /// <summary>
+    /// 动画
+    /// </summary>
+    Animator _animator;
+
+    /// <summary>
+    /// 静止时朝向
+    /// </summary>
+    Vector2 _lookDirection = new Vector2(0, 1);
+
+    Vector2 _move;
+
+
     /// <summary>
     /// 移动速度
     /// </summary>
@@ -17,21 +45,6 @@ public class RubyController : MonoBehaviour {
     [Header("最大生命值")]
     [Tooltip("最大生命值")]
     public int maxHealth = 5;
-
-
-    /// <summary>
-    /// 
-    /// </summary>
-    float horizontal;
-    /// <summary>
-    /// 
-    /// </summary>
-    float vertical;
-
-    /// <summary>
-    /// 绑定对象的刚体
-    /// </summary>
-    Rigidbody2D rigidbody2d;
 
     public int CurrentHealth {
         get => _currentHealth;
@@ -83,15 +96,17 @@ public class RubyController : MonoBehaviour {
         //锁帧
         //Application.targetFrameRate = 60;
 
-        rigidbody2d = GetComponent<Rigidbody2D>();
+        _rigidbody2d = GetComponent<Rigidbody2D>();
+        _animator = GetComponent<Animator>();
+        
     }
 
     /// <summary>
     /// Update is called once per frame
     /// </summary>
     void Update() {
-        horizontal = Input.GetAxis("Horizontal");
-        vertical = Input.GetAxis("Vertical");
+        _horizontal = Input.GetAxis("Horizontal");
+        _vertical = Input.GetAxis("Vertical");
     }
 
     /// <summary>
@@ -99,12 +114,55 @@ public class RubyController : MonoBehaviour {
     /// </summary>
     private void FixedUpdate() {
         Vector2 position = transform.position;
-        position.x += speed * horizontal * Time.deltaTime;
-        position.y += speed * vertical * Time.deltaTime;
+        position.x += speed * _horizontal * Time.deltaTime;
+        position.y += speed * _vertical * Time.deltaTime;
         transform.position = position;
 
+        //更新角色动画
+        UpdateAnimation();
+
+        //更新无敌时间
         UpdateInvincibleTimer();
     }
+
+    /// <summary>
+    /// 更新角色动画
+    /// </summary>
+    private void UpdateAnimation() {
+
+        _move = new Vector2(_horizontal, _vertical);
+        
+        if (!(Mathf.Approximately(_move.x, 0.0f) && Mathf.Approximately(_move.y, 0.0f))) {
+            //转向的时候，重新设定面向
+            _lookDirection.Set(_move.x, _move.y);
+            //设定为单位向量
+            _lookDirection.Normalize();
+        }
+
+        Debug.Log($"x:{_lookDirection.x}");
+        Debug.Log($"y:{_lookDirection.y}");
+        Debug.Log($"speed:{_lookDirection.magnitude}");
+        
+        UpdateAnimator(_lookDirection.magnitude, _lookDirection.x, _lookDirection.y, _isInvincible, false);
+    }
+
+
+    /// <summary>
+    /// 更新角色动画
+    /// </summary>
+    /// <param name="speed">速度</param>
+    /// <param name="lookX">x轴面向</param>
+    /// <param name="lookY">y轴面向</param>
+    /// <param name="isHit">是否被击中</param>
+    /// <param name="isLaunch">是否发射飞弹</param>
+    private void UpdateAnimator(float speed, float lookX, float lookY, bool isHit, bool isLaunch) {
+        _animator.SetFloat("Speed", speed);
+        _animator.SetFloat("Look X", lookX);
+        _animator.SetFloat("Look Y", lookY);
+        _animator.SetBool("Hit", isHit);
+        _animator.SetBool("Launch", isLaunch);
+    }
+
 
     /// <summary>
     /// 更新无敌时间

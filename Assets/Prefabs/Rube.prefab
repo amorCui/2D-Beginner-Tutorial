@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 2330601786193083683}
   - component: {fileID: -2689197650180709478}
   - component: {fileID: 5218276168762360732}
+  - component: {fileID: -6520105654811467403}
   m_Layer: 0
   m_Name: Rube
   m_TagString: Untagged
@@ -175,3 +176,23 @@ PolygonCollider2D:
       - {x: 0.1202454, y: 0.33232972}
       - {x: 0.12143655, y: 0.35138813}
       - {x: 0.0785551, y: 0.37640232}
+--- !u!95 &-6520105654811467403
+Animator:
+  serializedVersion: 4
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2330601786193083682}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: b77822e0485373d40b5beb92e9a5e728, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorControllerStateOnDisable: 0

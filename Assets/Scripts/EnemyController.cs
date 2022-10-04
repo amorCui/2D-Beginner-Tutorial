@@ -4,6 +4,25 @@ using UnityEngine;
 
 public class EnemyController : MonoBehaviour
 {
+    /// <summary>
+    /// 刚体坐标
+    /// </summary>
+    Vector2 _rigidbodyVector2;
+
+    /// <summary>
+    /// 绑定的动画
+    /// </summary>
+    Animator _animator;
+
+    /// <summary>
+    /// 绑定对象的刚体
+    /// </summary>
+    Rigidbody2D _rigidbody2d;
+
+    /// <summary>
+    /// 移动时间计时器
+    /// </summary>
+    private float _moveTimer;
 
     /// <summary>
     /// 速度
@@ -17,18 +36,17 @@ public class EnemyController : MonoBehaviour
     /// 移动时间计时器
     /// </summary>
     [Header("移动时间")]
-    [Tooltip("移动时间计时器")]
+    [Tooltip("用来标记移动时间的最大值")]
     [Range(0, 10.0f)]
     public float moveTimer = 5f;
-
-    private float _moveTimer;
+  
 
     /// <summary>
     /// 伤害数值
     /// </summary>
     [Header("伤害")]
     [Tooltip("伤害数值")]
-    public int damage = -1;
+    public int damage = 1;
 
     /// <summary>
     /// 垂直移动吗？
@@ -44,19 +62,14 @@ public class EnemyController : MonoBehaviour
     [Tooltip("director >0 正向移动， director< 0 负向移动")]
     public int director = 1;
 
-    Vector2 vector2;
-
-    Animator animator;
 
 
-    /// <summary>
-    /// 绑定对象的刚体
-    /// </summary>
-    Rigidbody2D rigidbody2d;
+
+
 
     private void Start() {
-        rigidbody2d = GetComponent<Rigidbody2D>();
-        animator = GetComponent<Animator>();
+        _rigidbody2d = GetComponent<Rigidbody2D>();
+        _animator = GetComponent<Animator>();
         _moveTimer = moveTimer;
         
     }
@@ -77,22 +90,31 @@ public class EnemyController : MonoBehaviour
     /// 
     /// </summary>
     private void FixedUpdate() {
-        
 
-        vector2 = rigidbody2d.position;
-        if (isVertical) {
-            vector2.x += speed * director  * Time.deltaTime;
-            Debug.Log($"Move X-director:{director}");
-            animator.SetFloat("Move X", director);
-        } else {
-            vector2.y += speed * director  * Time.deltaTime;
-            Debug.Log($"Move Y-director:{director}");
-            animator.SetFloat("Move Y", director);
-        }
-
-        rigidbody2d.MovePosition(vector2);
+        // 移动
+        Movement();
 
     }
+
+
+    private void Movement() {
+        _rigidbodyVector2 = _rigidbody2d.position;
+        if (!isVertical) {
+            //_rigidbodyVector2.x += speed * director * Time.deltaTime;
+            _rigidbodyVector2.x += speed * director * Time.fixedDeltaTime;
+            Debug.Log($"Move X-director:{director}");
+            _animator.SetFloat("Move X", director);
+        } else {
+            //_rigidbodyVector2.y += speed * director * Time.deltaTime;
+            _rigidbodyVector2.y += speed * director * Time.fixedDeltaTime;
+            Debug.Log($"Move Y-director:{director}");
+            _animator.SetFloat("Move Y", director);
+        }
+
+        _rigidbody2d.MovePosition(_rigidbodyVector2);
+    }
+
+
 
     /// <summary>
     /// 刚体于某个对象碰撞的时候触发的事件
@@ -104,7 +126,8 @@ public class EnemyController : MonoBehaviour
         RubyController rubyController = other.gameObject.GetComponent<RubyController>();
 
         if (rubyController != null) {
-            rubyController.ChangeHealth(damage);
+            rubyController.IsInvincible = true;
+            rubyController.ChangeHealth(-damage);
         }
         
     }

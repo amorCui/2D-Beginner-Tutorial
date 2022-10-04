@@ -1477,6 +1477,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 269960858}
     m_Modifications:
+    - target: {fileID: -2689197650180709478, guid: 21ca3b53eaefca548ab3926b1c4b028b, type: 3}
+      propertyPath: m_Simulated
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 2330601786193083682, guid: 21ca3b53eaefca548ab3926b1c4b028b, type: 3}
       propertyPath: m_Name
       value: Rube
