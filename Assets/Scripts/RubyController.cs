@@ -139,11 +139,13 @@ public class RubyController : MonoBehaviour {
             _lookDirection.Normalize();
         }
 
-        Debug.Log($"x:{_lookDirection.x}");
-        Debug.Log($"y:{_lookDirection.y}");
-        Debug.Log($"speed:{_lookDirection.magnitude}");
-        
-        UpdateAnimator(_lookDirection.magnitude, _lookDirection.x, _lookDirection.y, _isInvincible, false);
+        //Debug.Log($"x:{_lookDirection.x}");
+        //Debug.Log($"y:{_lookDirection.y}");
+        //Debug.Log($"speed:{_lookDirection.magnitude}");
+
+        // 在无敌期间第一次收到伤害，才会触发受击动画
+        bool isHurt = _isInvincible && Mathf.Approximately(_invincibleTimer, timeInvincible);
+        UpdateAnimator(_move.magnitude, _lookDirection.x, _lookDirection.y, isHurt, false);
     }
 
 
@@ -159,8 +161,13 @@ public class RubyController : MonoBehaviour {
         _animator.SetFloat("Speed", speed);
         _animator.SetFloat("Look X", lookX);
         _animator.SetFloat("Look Y", lookY);
-        _animator.SetBool("Hit", isHit);
-        _animator.SetBool("Launch", isLaunch);
+        if (isHit) {
+            _animator.SetTrigger("Hit");
+        }
+        if (isLaunch) {
+            _animator.SetTrigger("Launch");
+        }
+        
     }
 
 
