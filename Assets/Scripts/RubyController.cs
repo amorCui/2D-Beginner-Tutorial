@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.WSA;
 
 public class RubyController : MonoBehaviour {
 
@@ -70,6 +71,9 @@ public class RubyController : MonoBehaviour {
     //    get => _timeInvincible;
     //    set => _timeInvincible = value;
     //}
+    [Header("子弹")]
+    [Tooltip("子弹的prefeb")]
+    public GameObject bulletPrefeb;
 
     /// <summary>
     /// 无敌帧总时长
@@ -98,7 +102,7 @@ public class RubyController : MonoBehaviour {
 
         _rigidbody2d = GetComponent<Rigidbody2D>();
         _animator = GetComponent<Animator>();
-        
+
     }
 
     /// <summary>
@@ -107,6 +111,11 @@ public class RubyController : MonoBehaviour {
     void Update() {
         _horizontal = Input.GetAxis("Horizontal");
         _vertical = Input.GetAxis("Vertical");
+
+        // 获取用户输入发射子弹
+        if ( Input.GetKeyDown("c") || Input.GetButtonDown("Fire1") ) {
+            Launcher();
+        }
     }
 
     /// <summary>
@@ -131,8 +140,8 @@ public class RubyController : MonoBehaviour {
     private void UpdateAnimation() {
 
         _move = new Vector2(_horizontal, _vertical);
-        
-        if (!(Mathf.Approximately(_move.x, 0.0f) && Mathf.Approximately(_move.y, 0.0f))) {
+
+        if ( !( Mathf.Approximately(_move.x, 0.0f) && Mathf.Approximately(_move.y, 0.0f) ) ) {
             //转向的时候，重新设定面向
             _lookDirection.Set(_move.x, _move.y);
             //设定为单位向量
@@ -161,13 +170,13 @@ public class RubyController : MonoBehaviour {
         _animator.SetFloat("Speed", speed);
         _animator.SetFloat("Look X", lookX);
         _animator.SetFloat("Look Y", lookY);
-        if (isHit) {
+        if ( isHit ) {
             _animator.SetTrigger("Hit");
         }
-        if (isLaunch) {
+        if ( isLaunch ) {
             _animator.SetTrigger("Launch");
         }
-        
+
     }
 
 
@@ -176,10 +185,10 @@ public class RubyController : MonoBehaviour {
     /// </summary>
     private void UpdateInvincibleTimer() {
 
-        if (_isInvincible && _invincibleTimer >= 0) {
+        if ( _isInvincible && _invincibleTimer >= 0 ) {
             //Debug.Log($"UpdateInvincibleTimer:_isInvincible=>{_isInvincible},_invincibleTimer=>{_invincibleTimer}");
             _invincibleTimer = _invincibleTimer - Time.deltaTime;
-        } else if (_isInvincible && _invincibleTimer < 0) {
+        } else if ( _isInvincible && _invincibleTimer < 0 ) {
             //Debug.Log($"UpdateInvincibleTimer:_isInvincible=>{_isInvincible},_invincibleTimer=>{_invincibleTimer}");
             _isInvincible = false;
             _invincibleTimer = timeInvincible;
@@ -193,5 +202,18 @@ public class RubyController : MonoBehaviour {
     public void ChangeHealth(int amount) {
         _currentHealth = Mathf.Clamp(_currentHealth + amount, 0, maxHealth);
         Debug.Log($"当前生命值为:{CurrentHealth}/{maxHealth}");
+    }
+
+    /// <summary>
+    /// 射击事件
+    /// </summary>
+    void Launcher() {
+        // 初始化bullet对象实例
+        GameObject bullet = GameObject.Instantiate(bulletPrefeb, _rigidbody2d.position + Vector2.up * 0.5f, Quaternion.identity);
+
+        BulletController bulletController = bullet.GetComponent<BulletController>();
+
+        // 调用射击方法
+        bulletController.Launcher(_lookDirection);
     }
 }

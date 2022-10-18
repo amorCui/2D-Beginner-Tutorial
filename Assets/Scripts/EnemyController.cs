@@ -1,9 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting.Antlr3.Runtime;
 using UnityEngine;
 
-public class EnemyController : MonoBehaviour
-{
+public class EnemyController : MonoBehaviour {
     /// <summary>
     /// 刚体坐标
     /// </summary>
@@ -29,7 +29,7 @@ public class EnemyController : MonoBehaviour
     /// </summary>
     [Header("移动")]
     [Tooltip("移动速度")]
-    [Range(0,1.0f)]
+    [Range(0, 1.0f)]
     public float speed = 0.1f;
 
     /// <summary>
@@ -39,7 +39,7 @@ public class EnemyController : MonoBehaviour
     [Tooltip("用来标记移动时间的最大值")]
     [Range(0, 10.0f)]
     public float moveTimer = 5f;
-  
+
 
     /// <summary>
     /// 伤害数值
@@ -62,6 +62,10 @@ public class EnemyController : MonoBehaviour
     [Tooltip("director >0 正向移动， director< 0 负向移动")]
     public int director = 1;
 
+    [Header("机器人是否坏掉")]
+    [Tooltip("默认为true表示机器人是坏掉的，false表示机器人已修复")]
+    public bool broken = true;
+
 
 
 
@@ -71,25 +75,32 @@ public class EnemyController : MonoBehaviour
         _rigidbody2d = GetComponent<Rigidbody2D>();
         _animator = GetComponent<Animator>();
         _moveTimer = moveTimer;
-        
+
     }
 
     /// <summary>
     /// 
     /// </summary>
     private void Update() {
+        if ( !broken ) {
+            return;
+        }
 
         _moveTimer -= Time.deltaTime;
-        if (_moveTimer < 0) {
+        if ( _moveTimer < 0 ) {
             _moveTimer = moveTimer;
             director = -director;
-        } 
+        }
     }
 
     /// <summary>
     /// 
     /// </summary>
     private void FixedUpdate() {
+
+        if ( !broken ) {
+            return;
+        }
 
         // 移动
         Movement();
@@ -99,20 +110,22 @@ public class EnemyController : MonoBehaviour
 
     private void Movement() {
         _rigidbodyVector2 = _rigidbody2d.position;
-        if (!isVertical) {
+        if ( !isVertical ) {
             //_rigidbodyVector2.x += speed * director * Time.deltaTime;
             _rigidbodyVector2.x += speed * director * Time.fixedDeltaTime;
-            Debug.Log($"Move X-director:{director}");
+            //Debug.Log($"Move X-director:{director}");
             _animator.SetFloat("Move X", director);
         } else {
             //_rigidbodyVector2.y += speed * director * Time.deltaTime;
             _rigidbodyVector2.y += speed * director * Time.fixedDeltaTime;
-            Debug.Log($"Move Y-director:{director}");
+            //Debug.Log($"Move Y-director:{director}");
             _animator.SetFloat("Move Y", director);
         }
 
         _rigidbody2d.MovePosition(_rigidbodyVector2);
     }
+
+
 
 
 
@@ -125,11 +138,19 @@ public class EnemyController : MonoBehaviour
 
         RubyController rubyController = other.gameObject.GetComponent<RubyController>();
 
-        if (rubyController != null) {
+        if ( rubyController != null ) {
             rubyController.IsInvincible = true;
             rubyController.ChangeHealth(-damage);
         }
-        
+    }
+
+    /// <summary>
+    /// 修复机器人的方法
+    /// </summary>
+    public void Fix() {
+        broken = false;
+        _rigidbody2d.simulated = false;
+        _animator.SetTrigger("Fixed");
     }
 
 }

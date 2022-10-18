@@ -25,13 +25,13 @@ public class HealthController : MonoBehaviour {
 
         try {
             RubyController rubyCtrl = healthObj.GetComponent<RubyController>();
-            if (rubyCtrl.CurrentHealth < rubyCtrl.maxHealth) {
+            if ( rubyCtrl.CurrentHealth < rubyCtrl.maxHealth ) {
 
                 rubyCtrl.ChangeHealth(amount);
                 Destroy(gameObject);
             }
 
-        } catch (Exception ex) {
+        } catch ( Exception ex ) {
             Debug.LogException(ex);
         }
 
